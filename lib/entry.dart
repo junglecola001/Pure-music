@@ -17,6 +17,10 @@ import 'package:pure_music/page/folder_detail_page.dart';
 import 'package:pure_music/page/folders_page.dart';
 import 'package:pure_music/page/now_playing_page/now_playing_open_transition.dart';
 import 'package:pure_music/page/now_playing_page/page.dart';
+import 'package:pure_music/page/online_album_detail_page.dart';
+import 'package:pure_music/page/online_artist_detail_page.dart';
+import 'package:pure_music/page/online_music_page.dart';
+import 'package:pure_music/page/online_playlist_detail_page.dart';
 import 'package:pure_music/page/playlist_detail_page.dart';
 import 'package:pure_music/page/playlists_page.dart';
 import 'package:pure_music/page/settings_page/check_update.dart';
@@ -815,6 +819,39 @@ class _EntryState extends State<Entry>
               GoRoute(
                 path: 'detail',
                 pageBuilder: (context, state) => _playlistDetailPage(state),
+              ),
+            ],
+          ),
+          _maintainedBranch(
+            path: app_paths.ONLINE_PAGE,
+            child: const OnlineMusicPage(),
+            routes: [
+              GoRoute(
+                path: 'playlist/:id',
+                pageBuilder: (context, state) => _slidePage(
+                  key: state.pageKey,
+                  child: OnlinePlaylistDetailPage(
+                    playlistId: state.pathParameters['id']!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: 'album/:id',
+                pageBuilder: (context, state) => _slidePage(
+                  key: state.pageKey,
+                  child: OnlineAlbumDetailPage(
+                    albumId: state.pathParameters['id']!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: 'artist/:id',
+                pageBuilder: (context, state) => _slidePage(
+                  key: state.pageKey,
+                  child: OnlineArtistDetailPage(
+                    artistId: state.pathParameters['id']!,
+                  ),
+                ),
               ),
             ],
           ),

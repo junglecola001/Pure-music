@@ -15,6 +15,11 @@ const String FOLDER_DETAIL_PAGE = '/folders/detail';
 const String PLAYLISTS_PAGE = '/playlists';
 const String PLAYLIST_DETAIL_PAGE = '/playlists/detail';
 
+const String ONLINE_PAGE = '/online';
+const String ONLINE_PLAYLIST_DETAIL_PAGE = '/online/playlist';
+const String ONLINE_ALBUM_DETAIL_PAGE = '/online/album';
+const String ONLINE_ARTIST_DETAIL_PAGE = '/online/artist';
+
 const String CONCERT_PAGE = '/concert';
 
 const String NOW_PLAYING_PAGE = '/nowplaying';

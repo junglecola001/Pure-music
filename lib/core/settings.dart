@@ -12,6 +12,7 @@ import 'package:pure_music/core/utils.dart';
 import 'package:pure_music/core/zh_converter.dart';
 import 'package:pure_music/lyric/lyric_source.dart';
 import 'package:pure_music/lyric/lyric_tag_word_format.dart';
+import 'package:pure_music/services/online_music/models.dart';
 import 'package:flutter/material.dart';
 import 'package:github/github.dart';
 import 'package:path/path.dart' as path;
@@ -313,6 +314,15 @@ class AppSettings {
 
   String? midiSoundfontPath;
 
+  // 在线音源
+  bool onlineMusicEnabled = true;
+  String onlineMusicBaseUrl = 'http://127.0.0.1:3000';
+  String onlineMusicToken = '';
+  OnlineAudioQuality onlineMusicQuality = OnlineAudioQuality.hires;
+  bool onlineMusicKeepCache = true;
+  String? onlineMusicNodePath;
+  String? onlineMusicBackendDir;
+
   String? fontFamily;
   String? fontPath;
   bool lyricFontFollowsUi = true;
@@ -428,6 +438,7 @@ class AppSettings {
     _readLyricConversionAndDelaySettings(settingsMap);
     _readLyricTagSettings(settingsMap);
     _readMaterialScrobbleSettings(settingsMap);
+    _readOnlineMusicSettings(settingsMap);
     _readCoverColorSettings(settingsMap);
     _readBackgroundGlassSettings(settingsMap);
     _readWindowPlaybackSettings(settingsMap);
@@ -687,6 +698,35 @@ class AppSettings {
         settingsMap['WavyBarEnabledModes'],
       );
     }
+  }
+
+  static void _readOnlineMusicSettings(Map<String, dynamic> settingsMap) {
+    _instance.onlineMusicEnabled = normalizedBoolSetting(
+      settingsMap['OnlineMusicEnabled'],
+      defaultValue: true,
+    );
+    final baseUrl = settingsMap['OnlineMusicBaseUrl'];
+    if (baseUrl is String && baseUrl.trim().isNotEmpty) {
+      _instance.onlineMusicBaseUrl = baseUrl.trim();
+    }
+    final token = settingsMap['OnlineMusicToken'];
+    if (token is String) _instance.onlineMusicToken = token;
+    _instance.onlineMusicQuality = normalizedSettingEnumValue(
+      settingsMap['OnlineMusicQuality'],
+      OnlineAudioQuality.values,
+      fallback: OnlineAudioQuality.hires,
+    )!;
+    _instance.onlineMusicKeepCache = normalizedBoolSetting(
+      settingsMap['OnlineMusicKeepCache'],
+      defaultValue: true,
+    );
+    final nodePath = settingsMap['OnlineMusicNodePath'];
+    _instance.onlineMusicNodePath = nodePath is String && nodePath.trim().isNotEmpty
+        ? nodePath.trim()
+        : null;
+    final backendDir = settingsMap['OnlineMusicBackendDir'];
+    _instance.onlineMusicBackendDir =
+        backendDir is String && backendDir.trim().isNotEmpty ? backendDir.trim() : null;
   }
 
   static void _readCoverColorSettings(Map<String, dynamic> settingsMap) {
@@ -1194,6 +1234,16 @@ class AppSettings {
     'EnableSidebarFrostedGlass': enableSidebarFrostedGlass,
   };
 
+  Map<String, Object?> _onlineMusicSettingsMap() => {
+        'OnlineMusicEnabled': onlineMusicEnabled,
+        'OnlineMusicBaseUrl': onlineMusicBaseUrl,
+        'OnlineMusicToken': onlineMusicToken,
+        'OnlineMusicQuality': onlineMusicQuality.name,
+        'OnlineMusicKeepCache': onlineMusicKeepCache,
+        'OnlineMusicNodePath': onlineMusicNodePath,
+        'OnlineMusicBackendDir': onlineMusicBackendDir,
+      };
+
   Map<String, Object?> _windowFontPlaybackSettingsMap() => {
     'WindowCloseBehavior': windowCloseBehavior.name,
     'WindowCloseBehaviorChosen': windowCloseBehaviorChosen,
@@ -1257,6 +1307,7 @@ class AppSettings {
         ..._lyricSettingsMap(),
         ..._desktopLyricSettingsMap(),
         ..._materialAppearanceSettingsMap(),
+        ..._onlineMusicSettingsMap(),
         'IsWindowMaximized': isMaximized,
         ..._windowFontPlaybackSettingsMap(),
       };

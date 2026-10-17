@@ -116,3 +116,8 @@ skills-lock.json
 # Local diagnostics, not shipped
 tool/local/
 
+# Bundled NetEase API backend (dependencies and credentials are local only)
+backend/node_modules/
+backend/data/
+backend/.env
+backend/coverage/

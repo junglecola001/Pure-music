@@ -21,6 +21,7 @@ import 'package:pure_music/play_service/play_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:pure_music/library/library_page_snapshot_coordinator.dart';
+import 'package:pure_music/services/online_music/online_cover.dart';
 
 String _audioPathLookupKey(String value) {
   var normalized = value.trim().replaceAll('\\', '/');
@@ -2552,6 +2553,12 @@ class Audio {
   /// 播放次数（从 library.sqlite 读取/写入）
   int playCount;
 
+  /// 在线曲目 id，非空表示这行是在线音源的缓存占位条目。
+  final String? onlineSongId;
+
+  /// 在线封面地址，与 [onlineSongId] 配套。
+  final String? onlineCover;
+
   String? _searchNorm;
   String? _searchPinyin;
 
@@ -2598,6 +2605,8 @@ class Audio {
     this.by, {
     this.disc,
     this.playCount = 0,
+    this.onlineSongId,
+    this.onlineCover,
   }) : splitedArtists = _splitArtistNames(artist),
        splitedAlbumArtists = _splitArtistNames(albumArtist ?? '');
 
@@ -2617,6 +2626,8 @@ class Audio {
     _AudioLoadPool pool, {
     int? disc,
     int playCount = 0,
+    String? onlineSongId,
+    String? onlineCover,
   }) {
     final pooledArtist = pool.text(artist);
     final pooledAlbumArtist = pool.optionalText(albumArtist);
@@ -2637,6 +2648,8 @@ class Audio {
       pool.artistList(pooledAlbumArtist ?? ''),
       disc: disc,
       playCount: playCount,
+      onlineSongId: onlineSongId,
+      onlineCover: onlineCover,
     ).._primeSearchCache(pool);
   }
 
@@ -2657,6 +2670,8 @@ class Audio {
     this.splitedAlbumArtists, {
     this.disc,
     this.playCount = 0,
+    this.onlineSongId,
+    this.onlineCover,
   });
 
   String get _pathLookupKey =>
@@ -2859,6 +2874,13 @@ class Audio {
   /// 先检查 _coverImage，命中直接返回同一实例；永不走 FFI
   Future<ImageProvider?> get cover async {
     _touchCoverAccess();
+    if (onlineSongId != null) {
+      try {
+        return await OnlineCoverCache.instance.imageProvider(onlineCover, width: 48);
+      } catch (_) {
+        return null;
+      }
+    }
     final cached = _coverImage?.target;
     if (cached != null) return cached;
     final generation = _coverCacheGeneration;
@@ -2983,6 +3005,13 @@ class Audio {
   /// 200 * 200
   Future<ImageProvider?> get mediumCover async {
     _touchCoverAccess();
+    if (onlineSongId != null) {
+      try {
+        return await OnlineCoverCache.instance.imageProvider(onlineCover, width: 200);
+      } catch (_) {
+        return null;
+      }
+    }
     final cached = _mediumCoverImage?.target;
     if (cached != null) return cached;
     final generation = _coverCacheGeneration;
@@ -3009,6 +3038,13 @@ class Audio {
   /// size: 520 * devicePixelRatio（屏幕缩放大小）
   Future<ImageProvider?> get largeCover async {
     _touchCoverAccess();
+    if (onlineSongId != null) {
+      try {
+        return await OnlineCoverCache.instance.imageProvider(onlineCover, width: 420);
+      } catch (_) {
+        return null;
+      }
+    }
     final cached = _largeCoverImage?.target;
     if (cached != null) return cached;
     final generation = _coverCacheGeneration;

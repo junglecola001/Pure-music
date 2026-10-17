@@ -35,6 +35,7 @@ import 'package:pure_music/page/settings_page/tabs/settings_section_header.dart'
 import 'package:pure_music/page/settings_page/hotkey_settings.dart'
     show HotkeySettingsPanel, GlobalHotkeySettingsPanel;
 import 'package:pure_music/page/settings_page/lastfm_settings.dart';
+import 'package:pure_music/page/settings_page/online_source_settings.dart';
 import 'package:pure_music/page/settings_page/backup_settings.dart';
 import 'package:pure_music/page/settings_page/other_settings.dart'
     show
@@ -1814,6 +1815,13 @@ class _PlaybackTabContent extends StatelessWidget {
           groupId: 'playback-lastfm',
         ),
         SizedBox(height: 8.0),
+        _GroupEntry(
+          icon: Symbols.cloud,
+          title: '在线音源',
+          subtitle: '在线搜索播放、会员与缓存',
+          groupId: 'online-source',
+        ),
+        SizedBox(height: 8.0),
         SettingsSectionHeader('任务栏和热键'),
         SizedBox(height: 4.0),
         _GroupEntry(
@@ -3534,6 +3542,11 @@ const _settingsGroups = <String, _SettingsGroupDesc>{
     '授权账号并提交播放记录',
     _PlaybackLastFmGroup(),
   ),
+  'online-source': _SettingsGroupDesc(
+    '在线音源',
+    '在线搜索播放、会员与缓存',
+    _OnlineSourceGroup(),
+  ),
   'taskbar-control': _SettingsGroupDesc(
     '任务栏',
     '播放按钮与封面预览',
@@ -4228,6 +4241,22 @@ class _PlaybackLastFmGroup extends StatelessWidget {
         SettingsSectionHeader('Last.fm'),
         SizedBox(height: 4.0),
         LastFmSettingsPanel(),
+      ],
+    );
+  }
+}
+
+class _OnlineSourceGroup extends StatelessWidget {
+  const _OnlineSourceGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 96.0, right: 20),
+      children: const [
+        SettingsSectionHeader('在线音源'),
+        SizedBox(height: 4.0),
+        OnlineSourceSettingsPanel(),
       ],
     );
   }

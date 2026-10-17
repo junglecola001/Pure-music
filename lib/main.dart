@@ -22,6 +22,8 @@ import 'package:pure_music/core/log/rust_log_line.dart';
 import 'package:pure_music/core/utils.dart';
 import 'package:pure_music/core/window_lifecycle.dart';
 import 'package:pure_music/core/window_placement.dart';
+import 'package:pure_music/services/online_music/backend_process.dart';
+import 'package:pure_music/services/online_music/online_music_service.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_single_instance/flutter_single_instance.dart';
@@ -229,7 +231,20 @@ Future<bool> _loadSettingsAndCaches() async {
   }
   await HotkeysHelper.registerHotKeys();
   await AlbumColorCache.instance.init();
+  _startOnlineMusicBackend();
   return !File(path.join(supportPath, 'index.json')).existsSync();
+}
+
+// 在线音源后端随播放器启动；失败时由页面/设置展示错误，不阻塞启动。
+void _startOnlineMusicBackend() {
+  if (!AppSettings.instance.onlineMusicEnabled) return;
+  unawaited(() async {
+    try {
+      await OnlineMusicService.instance.ensureReady();
+      if (!OnlineMusicService.instance.isReady) return;
+      await OnlineMusicService.instance.refreshAuth();
+    } catch (_) {}
+  }());
 }
 
 Future<bool> _initWindowShell() async {
@@ -252,6 +267,9 @@ StreamSubscription<String>? _rustLoggerSub;
 
 Future<void> disposeRuntimeResources() async {
   MemoryMonitorService.instance.stop();
+  try {
+    await OnlineBackendProcess.instance.stop();
+  } catch (_) {}
   final rustLoggerSub = _rustLoggerSub;
   _rustLoggerSub = null;
   if (rustLoggerSub != null) {

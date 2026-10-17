@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:pure_music/core/preference.dart';
 import 'package:pure_music/core/cache.dart';
@@ -25,6 +26,8 @@ import 'package:pure_music/core/log/playback_log.dart';
 import 'package:pure_music/core/utils.dart';
 import 'package:pure_music/core/theme.dart';
 import 'package:pure_music/core/settings.dart';
+import 'package:pure_music/services/online_music/backend_client.dart';
+import 'package:pure_music/services/online_music/online_playback.dart';
 import 'package:pure_music/services/concert_session.dart';
 import 'package:pure_music/services/lastfm/lastfm_models.dart';
 import 'package:pure_music/services/lastfm/lastfm_service.dart';
@@ -68,6 +71,7 @@ class PlaybackService extends ChangeNotifier {
   _PendingGaplessTransition? _pendingGaplessTransition;
   int _replayGainRequestToken = 0;
   int _skipLeadingSilenceToken = 0;
+  int _onlinePlaybackToken = 0;
   bool _midiMissingFontWarned = false;
   double? _diagAt;
   double? _diagLength;
@@ -1098,6 +1102,10 @@ class PlaybackService extends ChangeNotifier {
     }
 
     final audio = items[targetIndex];
+    if (audio.onlineSongId != null && !File(audio.path).existsSync()) {
+      _pendingGaplessTransition = null;
+      return;
+    }
     final pending = _PendingGaplessTransition(
       id: _nextGaplessTransitionId++,
       playlistRevision: _playlistRevision,
@@ -1264,6 +1272,69 @@ class PlaybackService extends ChangeNotifier {
   }) {
     if (audioIndex < 0 || audioIndex >= playlist.length) return false;
     final audio = playlist[audioIndex];
+    if (audio.onlineSongId != null) {
+      unawaited(
+        _loadAndPlayOnline(
+          audioIndex,
+          playlist,
+          reason: reason,
+          origin: origin,
+        ),
+      );
+      return true;
+    }
+    _onlinePlaybackToken++;
+    return _loadAndPlayLocal(
+      audio,
+      audioIndex,
+      playlist,
+      reason: reason,
+      origin: origin,
+      reportFailure: reportFailure,
+    );
+  }
+
+  /// 在线曲目先下载缓存，就绪后再走本地播放路径。
+  Future<void> _loadAndPlayOnline(
+    int audioIndex,
+    List<Audio> playlist, {
+    required String reason,
+    required SongOrigin? origin,
+  }) async {
+    final token = ++_onlinePlaybackToken;
+    final audio = playlist[audioIndex];
+    try {
+      await OnlinePlayback.instance.ensurePrepared(audio);
+    } catch (error) {
+      if (_closed || token != _onlinePlaybackToken) return;
+      _reportPlaybackLoadFailure(
+        error is OnlineApiException ? error.message : '在线音源加载失败，请查看日志',
+      );
+      return;
+    }
+    if (_closed || token != _onlinePlaybackToken) return;
+    if (!identical(playlist, _playlist.value) && !playlist.contains(audio)) {
+      return;
+    }
+    if (audioIndex < 0 || audioIndex >= playlist.length) return;
+    _loadAndPlayLocal(
+      audio,
+      audioIndex,
+      playlist,
+      reason: reason,
+      origin: origin,
+      reportFailure: true,
+    );
+  }
+
+  bool _loadAndPlayLocal(
+    Audio audio,
+    int audioIndex,
+    List<Audio> playlist, {
+    required String reason,
+    required SongOrigin? origin,
+    bool reportFailure = true,
+  }) {
     _invalidateGaplessPreparation();
     developer.Timeline.startSync('playback.loadAndPlay');
     try {

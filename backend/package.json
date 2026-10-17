@@ -1,0 +1,25 @@
+{
+  "name": "netease-player-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone single-account NetEase Cloud Music API backend (no bundled frontend)",
+  "main": "src/app.js",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node --test test/*.test.js",
+    "check": "node scripts/check.js",
+    "docs": "node scripts/generate-openapi.js",
+    "verify:live": "node scripts/verify-live.mjs"
+  },
+  "overrides": {
+    "basic-ftp": "6.2.1",
+    "music-metadata": "11.16.1"
+  },
+  "dependencies": {
+    "NeteaseCloudMusicApi": "4.32.0",
+    "express": "5.1.0",
+    "ipaddr.js": "2.2.0"
+  }
+}
