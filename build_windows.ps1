@@ -1,10 +1,11 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 
 [CmdletBinding()]
 param(
     [string]$Version = "",
     [ValidateSet(0, 1, 2, 3, 4, 5)]
     [int]$Mode = 0,
+    [string]$Arch = "x64",
     [switch]$NonInteractive,
     [switch]$Clean
 )
@@ -15,6 +16,13 @@ try { [Console]::InputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
 $ErrorActionPreference = "Stop"
+
+# 目标架构：决定构建产物目录、BASS 原生库目录与产物命名。
+# x64 保持原有产物名以兼容更新检查；arm64 产物加 _arm64 后缀。
+$Arch = $Arch.Trim().ToLowerInvariant()
+if ($Arch -notin @("x64", "arm64")) {
+    throw "Invalid -Arch value: $Arch (expected x64 or arm64)."
+}
 
 $finalOutputDir = Join-Path $PSScriptRoot "output"
 $script:stagingContainer = $null
@@ -191,6 +199,42 @@ function Assert-PathWithin([string]$path, [string]$parent) {
     }
 }
 
+function Get-ArchSuffix() {
+    if ($Arch -eq "arm64") { return "_arm64" }
+    return ""
+}
+
+function Get-PeMachine([string]$path) {
+    $stream = [System.IO.File]::OpenRead($path)
+    try {
+        $reader = New-Object System.IO.BinaryReader($stream)
+        $stream.Position = 0x3C
+        $peOffset = $reader.ReadInt32()
+        if ($peOffset -le 0 -or $peOffset -gt ($stream.Length - 6)) { return 0 }
+        $stream.Position = $peOffset
+        $signature = $reader.ReadBytes(4)
+        if ($signature[0] -ne 0x50 -or $signature[1] -ne 0x45 -or $signature[2] -ne 0 -or $signature[3] -ne 0) { return 0 }
+        return [int]$reader.ReadUInt16()
+    }
+    finally {
+        $stream.Dispose()
+    }
+}
+
+# 校验产物与 -Arch 一致，避免在错误宿主上打包出架构不符的发行包。
+function Assert-Architecture([string]$appDir) {
+    if ($Arch -eq "arm64") { $expected = 0xAA64 } else { $expected = 0x8664 }
+    foreach ($rp in @("pure_music.exe", "dll\rust_lib_pure_music.dll", "dll\BASS\bass.dll")) {
+        $path = Join-Path $appDir $rp
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
+        $machine = Get-PeMachine $path
+        if ($machine -ne $expected) {
+            throw ("Architecture mismatch for {0}: machine=0x{1:X4}, expected 0x{2:X4} (-Arch {3})" -f $rp, $machine, $expected, $Arch)
+        }
+    }
+    Write-Host "Architecture check passed: $Arch" -ForegroundColor Green
+}
+
 function Update-PubspecVersion([string]$version) {
     $pubspecPath = Join-Path $PSScriptRoot "pubspec.yaml"
     if (-not (Test-Path $pubspecPath)) { throw "pubspec.yaml not found." }
@@ -332,9 +376,9 @@ function Invoke-Build([string]$version, [bool]$isPortable) {
 }
 
 function New-AppPackage([string]$artifactRoot, [string]$version) {
-    $buildDir = Join-Path $PSScriptRoot "build\windows\x64\runner\Release"
+    $buildDir = Join-Path $PSScriptRoot "build\windows\$Arch\runner\Release"
     if (-not (Test-Path -LiteralPath (Join-Path $buildDir "pure_music.exe") -PathType Leaf)) {
-        throw "Build output is incomplete: $buildDir"
+        throw "Build output is incomplete: $buildDir. Flutter builds the host architecture only, so -Arch $Arch must run on a matching host."
     }
 
     $finalAppDir = $artifactRoot
@@ -376,6 +420,7 @@ function New-AppPackage([string]$artifactRoot, [string]$version) {
 
     Invoke-Step "copy BASS DLLs" {
         $bassSrcDir = Join-Path $PSScriptRoot "BASS"
+        if ($Arch -eq "arm64") { $bassSrcDir = Join-Path $bassSrcDir "arm64" }
         $bassDestDir = Join-Path $finalDllDir "BASS"
         if (-not (Test-Path $bassSrcDir)) {
             throw "BASS directory not found in project root: $bassSrcDir"
@@ -430,6 +475,7 @@ function Test-KeyFiles([string]$appDir) {
     if ($missing.Count -gt 0) {
         throw "Package missing required files: $($missing -join ', ')"
     }
+    Assert-Architecture $appDir
     Write-Host "Key file check passed." -ForegroundColor Green
 }
 
@@ -514,7 +560,7 @@ function Set-ZipPortableSupportHidden([string]$zipPath) {
 
 function New-PortablePackage([string]$version, [bool]$buildFirst, [bool]$makeZip) {
     if ($buildFirst) { Invoke-Build $version $true }
-    $artifactName = "pure_music_{0}_release_portable" -f $version
+    $artifactName = "pure_music_{0}_release_portable{1}" -f $version, (Get-ArchSuffix)
     $publishedRoot = Join-Path $finalOutputDir $artifactName
     $publishedZip = Join-Path $finalOutputDir "$artifactName.zip"
     $publishedChecksum = "$publishedZip.sha256"
@@ -622,7 +668,7 @@ function New-PortablePackage([string]$version, [bool]$buildFirst, [bool]$makeZip
 
 function New-InstallerPackage([string]$version, [bool]$buildFirst) {
     if ($buildFirst) { Invoke-Build $version $false }
-    $artifactName = "pure_music_{0}_release_installer" -f $version
+    $artifactName = "pure_music_{0}_release_installer{1}" -f $version, (Get-ArchSuffix)
     $publishedInstaller = Join-Path $finalOutputDir "$artifactName.exe"
     $publishedChecksum = "$publishedInstaller.sha256"
 
@@ -649,9 +695,11 @@ function New-InstallerPackage([string]$version, [bool]$buildFirst) {
         Invoke-Step "create Inno Setup installer" {
             $compiledOutputDir = Join-Path $staging "compiled"
             New-Item -ItemType Directory -Force -Path $compiledOutputDir | Out-Null
+            if ($Arch -eq "arm64") { $isArm64Define = "1" } else { $isArm64Define = "0" }
             $innoArgs = @(
                 "/DSourceDir=$finalAppDir",
                 "/DAppVersion=$version",
+                "/DIsArm64=$isArm64Define",
                 "/O$compiledOutputDir",
                 "/F$artifactName",
                 $installerScript
@@ -702,6 +750,7 @@ trap {
 }
 
 Write-Host "`n===== Pure Music Build =====" -ForegroundColor Cyan
+Write-Host "  Arch: $Arch" -ForegroundColor White
 Write-Host "  1. 编译便携版（只出文件夹，不打包）" -ForegroundColor White
 Write-Host "  2. 编译便携版并打包 zip" -ForegroundColor White
 Write-Host "  3. 编译并制作 Inno Setup 安装器" -ForegroundColor White

@@ -116,12 +116,24 @@ install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   COMPONENT Runtime)
 
 # Install BASS audio library & plugins (required at runtime)
-file(GLOB BASS_PLUGINS "${CMAKE_SOURCE_DIR}/../BASS/*.dll")
+# 原生库必须与目标架构一致：x64 用 BASS 根目录，arm64 用 BASS/arm64。
+if(NOT FLUTTER_TARGET_PLATFORM)
+  set(FLUTTER_TARGET_PLATFORM "windows-x64")
+endif()
+if(FLUTTER_TARGET_PLATFORM STREQUAL "windows-arm64")
+  set(BASS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../BASS/arm64")
+else()
+  set(BASS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../BASS")
+endif()
+file(GLOB BASS_PLUGINS "${BASS_SOURCE_DIR}/*.dll")
 install(FILES ${BASS_PLUGINS}
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/dll/BASS"
     COMPONENT Runtime)
 
 # Install desktop_lyric (required at runtime)
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/../desktop_lyric/desktop_lyric.exe")
+  message(FATAL_ERROR "desktop_lyric runtime not found: put the built desktop lyric app into desktop_lyric/ before building.")
+endif()
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/../desktop_lyric/"
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}/desktop_lyric"
     COMPONENT Runtime)

@@ -8,6 +8,11 @@
 #define AppName "Pure Music"
 #define AppExeName "pure_music.exe"
 
+; 安装包目标架构，由构建脚本通过 /DIsArm64=1 指定（默认 x64）。
+#ifndef IsArm64
+  #define IsArm64 0
+#endif
+
 [Setup]
 AppId={{42C4470A-72BE-49A0-B32F-DF7A941DD48C}
 AppName={#AppName}
@@ -23,8 +28,13 @@ AppCopyright=Copyright (C) 2026 junglecola001
 DefaultDirName={localappdata}\Programs\{#AppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
+#if IsArm64
+ArchitecturesAllowed=arm64
+ArchitecturesInstallIn64BitMode=arm64
+#else
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+#endif
 OutputDir=.
 OutputBaseFilename=pure_music_installer
 SetupIconFile=..\app_icon.ico

@@ -1,0 +1,129 @@
+name: build-windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 发布版本号（例如 2.4.0）
+        required: true
+        default: 2.4.0
+      lyric_ref:
+        description: 桌面歌词源码 commit
+        required: false
+        default: e0e85da74ea4e35fa5c6d41be2677b54c608410e
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: 3.44.6
+
+jobs:
+  build:
+    name: build (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            os: windows-latest
+          - arch: arm64
+            os: windows-11-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: C:\flutter
+          key: flutter-${{ env.FLUTTER_VERSION }}-windows
+
+      - name: Install Flutter
+        shell: pwsh
+        run: |
+          $sdk = "C:\flutter"
+          if (-not (Test-Path "$sdk\bin\flutter.bat")) {
+            $zip = Join-Path $env:RUNNER_TEMP "flutter.zip"
+            curl.exe -L --retry 3 --retry-delay 5 -o $zip "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_$env:FLUTTER_VERSION-stable.zip"
+            if ($LASTEXITCODE -ne 0) { throw "Flutter SDK download failed." }
+            $sevenZip = "C:\Program Files\7-Zip\7z.exe"
+            if (Test-Path $sevenZip) {
+              & $sevenZip x $zip "-oC:\" -y | Out-Null
+              if ($LASTEXITCODE -ne 0) { throw "Flutter SDK extraction failed." }
+            }
+            else {
+              Expand-Archive -Path $zip -DestinationPath "C:\" -Force
+            }
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value "$sdk\bin"
+          & "$sdk\bin\flutter.bat" --version
+          if ($LASTEXITCODE -ne 0) { throw "Flutter SDK is not usable." }
+
+      - name: Build desktop lyric
+        shell: pwsh
+        run: |
+          git clone --quiet https://github.com/qingyueyin/pure-player-lyric.git _desktop_lyric_src
+          if ($LASTEXITCODE -ne 0) { throw "Desktop lyric source clone failed." }
+          git -C _desktop_lyric_src checkout --quiet ${{ inputs.lyric_ref }}
+          if ($LASTEXITCODE -ne 0) { throw "Desktop lyric source checkout failed." }
+          Push-Location _desktop_lyric_src
+          try {
+            flutter pub get
+            if ($LASTEXITCODE -ne 0) { throw "Desktop lyric pub get failed." }
+            flutter build windows --release --no-pub
+            if ($LASTEXITCODE -ne 0) { throw "Desktop lyric build failed." }
+          }
+          finally { Pop-Location }
+          $release = "_desktop_lyric_src\build\windows\${{ matrix.arch }}\runner\Release"
+          if (-not (Test-Path "$release\desktop_lyric.exe")) {
+            $found = Get-ChildItem "_desktop_lyric_src\build\windows" -Directory -ErrorAction SilentlyContinue |
+              ForEach-Object { Join-Path $_.FullName "runner\Release" } |
+              Where-Object { Test-Path (Join-Path $_ "desktop_lyric.exe") }
+            if (-not $found) { throw "Desktop lyric build output not found." }
+            $release = $found[0]
+          }
+          New-Item -ItemType Directory -Force -Path desktop_lyric | Out-Null
+          Copy-Item -Path "$release\*" -Destination desktop_lyric -Recurse -Force
+          Write-Host "Desktop lyric runtime: $(Get-Item 'desktop_lyric\desktop_lyric.exe').Length bytes"
+
+      - name: Install Inno Setup if missing
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "C:\Program Files\Inno Setup 6\ISCC.exe",
+            "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          )
+          if ($candidates | Where-Object { Test-Path $_ }) { return }
+          if (Get-Command ISCC.exe -ErrorAction SilentlyContinue) { return }
+          choco install innosetup --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup installation failed." }
+
+      - name: Build installer and portable package
+        shell: pwsh
+        run: |
+          $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+          $version = "${{ inputs.version }}"
+          $arch = "${{ matrix.arch }}"
+          & $pwshPath -NoProfile -ExecutionPolicy Bypass -File .\build_windows.ps1 -Version $version -Arch $arch -NonInteractive -Mode 2
+          if ($LASTEXITCODE -ne 0) { throw "Portable build failed." }
+          & $pwshPath -NoProfile -ExecutionPolicy Bypass -File .\build_windows.ps1 -Version $version -Arch $arch -NonInteractive -Mode 3
+          if ($LASTEXITCODE -ne 0) { throw "Installer build failed." }
+
+      - name: Show artifacts
+        shell: pwsh
+        run: |
+          Get-ChildItem output -File | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pure-music-${{ matrix.arch }}
+          path: |
+            output/*.exe
+            output/*.zip
+            output/*.sha256
+          if-no-files-found: error
+          retention-days: 14
