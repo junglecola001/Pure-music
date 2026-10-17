@@ -39,28 +39,84 @@ jobs:
         uses: actions/cache@v4
         with:
           path: C:\flutter
-          key: flutter-${{ env.FLUTTER_VERSION }}-windows
+          key: flutter-${{ env.FLUTTER_VERSION }}-windows-${{ matrix.arch }}
 
       - name: Install Flutter
         shell: pwsh
         run: |
+          function Get-PeMachine([string]$Path) {
+            $fs = [System.IO.File]::OpenRead($Path)
+            try {
+              $br = New-Object System.IO.BinaryReader($fs)
+              $fs.Position = 0x3C
+              $peOffset = $br.ReadInt32()
+              $fs.Position = $peOffset + 4
+              return $br.ReadUInt16()
+            }
+            finally { $fs.Dispose() }
+          }
+
+          function Expand-Zip([string]$ZipPath, [string]$Destination) {
+            $sevenZip = "C:\Program Files\7-Zip\7z.exe"
+            if (Test-Path $sevenZip) {
+              & $sevenZip x $ZipPath "-o$Destination" -y | Out-Null
+              if ($LASTEXITCODE -ne 0) { throw "Extraction failed: $ZipPath" }
+            }
+            else {
+              Expand-Archive -Path $ZipPath -DestinationPath $Destination -Force
+            }
+          }
+
           $sdk = "C:\flutter"
           if (-not (Test-Path "$sdk\bin\flutter.bat")) {
             $zip = Join-Path $env:RUNNER_TEMP "flutter.zip"
             curl.exe -L --retry 3 --retry-delay 5 -o $zip "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_$env:FLUTTER_VERSION-stable.zip"
             if ($LASTEXITCODE -ne 0) { throw "Flutter SDK download failed." }
-            $sevenZip = "C:\Program Files\7-Zip\7z.exe"
-            if (Test-Path $sevenZip) {
-              & $sevenZip x $zip "-oC:\" -y | Out-Null
-              if ($LASTEXITCODE -ne 0) { throw "Flutter SDK extraction failed." }
-            }
-            else {
-              Expand-Archive -Path $zip -DestinationPath "C:\" -Force
-            }
+            Expand-Zip $zip "C:\"
           }
+          New-Item -ItemType Directory -Force -Path "$sdk\bin\cache" | Out-Null
+
+          # Flutter 官方 Windows SDK 只带 x64 的 Dart SDK。在 ARM64 宿主上跑 x64 的
+          # flutter 工具会让它把宿主识别成 x64，从而构建出 x64 产物；而且 flutter 工具
+          # 无法可靠地按宿主架构选择 Dart SDK，所以这里直接换成官方 windows-arm64 版。
+          $expected = if ("${{ matrix.arch }}" -eq "arm64") { 0xAA64 } else { 0x8664 }
+          $dartExe = "$sdk\bin\cache\dart-sdk\bin\dart.exe"
+          $machine = if (Test-Path $dartExe) { Get-PeMachine $dartExe } else { 0 }
+          if ($expected -eq 0xAA64 -and $machine -ne 0xAA64) {
+            $engine = ""
+            foreach ($path in @("$sdk\bin\internal\engine.version", "$sdk\bin\cache\engine.stamp")) {
+              if (-not (Test-Path $path)) { continue }
+              $value = (Get-Content $path -Raw).Trim()
+              if ($value) { $engine = $value; break }
+            }
+            if (-not $engine) { throw "Unable to determine Flutter engine version." }
+            $baseUrl = "https://storage.googleapis.com"
+            $realmPath = "$sdk\bin\cache\engine.realm"
+            if (Test-Path $realmPath) {
+              $realm = (Get-Content $realmPath -Raw).Trim()
+              if ($realm) { $baseUrl = "$baseUrl/$realm" }
+            }
+            $dartUrl = "$baseUrl/flutter_infra_release/flutter/$engine/dart-sdk-windows-arm64.zip"
+            Write-Host "Installing arm64 Dart SDK: $dartUrl"
+            Remove-Item "$sdk\bin\cache\dart-sdk" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item "$sdk\bin\cache\flutter_tools.snapshot" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$sdk\bin\cache\flutter_tools.stamp" -Force -ErrorAction SilentlyContinue
+            $dartZip = Join-Path $env:RUNNER_TEMP "dart-sdk-windows-arm64.zip"
+            curl.exe -L --retry 3 --retry-delay 5 -o $dartZip $dartUrl
+            if ($LASTEXITCODE -ne 0) { throw "Dart SDK download failed." }
+            Expand-Zip $dartZip "$sdk\bin\cache"
+            if (-not (Test-Path $dartExe)) { throw "Dart SDK not found after extraction: $dartExe" }
+            Set-Content -Path "$sdk\bin\cache\engine-dart-sdk.stamp" -Value $engine
+          }
+
           Add-Content -Path $env:GITHUB_PATH -Value "$sdk\bin"
           & "$sdk\bin\flutter.bat" --version
           if ($LASTEXITCODE -ne 0) { throw "Flutter SDK is not usable." }
+
+          if (-not (Test-Path $dartExe)) { throw "Dart SDK not found: $dartExe" }
+          $machine = Get-PeMachine $dartExe
+          Write-Host ("dart.exe machine: 0x{0:X4} (expected 0x{1:X4})" -f $machine, $expected)
+          if ($machine -ne $expected) { throw "Dart SDK architecture mismatch for ${{ matrix.arch }}." }
 
       - name: Build desktop lyric
         shell: pwsh
@@ -79,27 +135,42 @@ jobs:
           finally { Pop-Location }
           $release = "_desktop_lyric_src\build\windows\${{ matrix.arch }}\runner\Release"
           if (-not (Test-Path "$release\desktop_lyric.exe")) {
-            $found = Get-ChildItem "_desktop_lyric_src\build\windows" -Directory -ErrorAction SilentlyContinue |
+            $found = @(Get-ChildItem "_desktop_lyric_src\build\windows" -Directory -ErrorAction SilentlyContinue |
               ForEach-Object { Join-Path $_.FullName "runner\Release" } |
-              Where-Object { Test-Path (Join-Path $_ "desktop_lyric.exe") }
-            if (-not $found) { throw "Desktop lyric build output not found." }
+              Where-Object { Test-Path (Join-Path $_ "desktop_lyric.exe") })
+            if ($found.Count -eq 0) { throw "Desktop lyric build output not found." }
             $release = $found[0]
           }
           New-Item -ItemType Directory -Force -Path desktop_lyric | Out-Null
           Copy-Item -Path "$release\*" -Destination desktop_lyric -Recurse -Force
           Write-Host "Desktop lyric runtime: $(Get-Item 'desktop_lyric\desktop_lyric.exe').Length bytes"
 
-      - name: Install Inno Setup if missing
+      - name: Install Inno Setup and Chinese language file
         shell: pwsh
         run: |
           $candidates = @(
+            "C:\Program Files\Inno Setup 7\ISCC.exe",
+            "C:\Program Files (x86)\Inno Setup 7\ISCC.exe",
             "C:\Program Files\Inno Setup 6\ISCC.exe",
             "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           )
-          if ($candidates | Where-Object { Test-Path $_ }) { return }
-          if (Get-Command ISCC.exe -ErrorAction SilentlyContinue) { return }
-          choco install innosetup --no-progress -y
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup installation failed." }
+          $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $iscc) {
+            $cmd = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+            if ($cmd) { $iscc = $cmd.Source }
+          }
+          if (-not $iscc) {
+            choco install innosetup --no-progress -y
+            if ($LASTEXITCODE -ne 0) { throw "Inno Setup installation failed." }
+            $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          if (-not $iscc) { throw "Inno Setup compiler not found." }
+          # 官方 Inno Setup 不带简体中文语言文件，从仓库随附版本安装到编译器 Languages 目录。
+          $langDir = Join-Path (Split-Path $iscc) "Languages"
+          New-Item -ItemType Directory -Force -Path $langDir | Out-Null
+          Copy-Item -Path "installer\languages\ChineseSimplified.isl" -Destination (Join-Path $langDir "ChineseSimplified.isl") -Force
+          Write-Host "ISCC: $iscc"
+          Write-Host "ChineseSimplified.isl installed to: $langDir"
 
       - name: Build installer and portable package
         shell: pwsh
