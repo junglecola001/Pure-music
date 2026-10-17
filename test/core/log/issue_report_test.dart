@@ -113,7 +113,7 @@ void main() {
 
   test('issue url uses the bug form and prefills known fields', () {
     final uri = buildBugIssueUri(
-      owner: 'qingyueyin',
+      owner: 'junglecola001',
       repo: 'Pure-music',
       fields: parseIssueFormFields(
         title: '放到一半切歌',
@@ -124,7 +124,7 @@ void main() {
     );
     expect(uri.scheme, 'https');
     expect(uri.host, 'github.com');
-    expect(uri.path, '/qingyueyin/Pure-music/issues/new');
+    expect(uri.path, '/junglecola001/Pure-music/issues/new');
     expect(uri.queryParameters['template'], issueBugTemplateFile);
     expect(uri.queryParameters['title'], '[BUG] 放到一半切歌');
     expect(uri.queryParameters['version'], '2.3.0');
@@ -138,7 +138,7 @@ void main() {
 
   test('long fields are dropped before the url exceeds the cap', () {
     final uri = buildBugIssueUri(
-      owner: 'qingyueyin',
+      owner: 'junglecola001',
       repo: 'Pure-music',
       maxChars: 280,
       fields: const IssueFormFields(

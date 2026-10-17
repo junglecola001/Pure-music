@@ -19,7 +19,7 @@ description: 图标、字体、音频引擎与参考项目。
 
 ## 协议
 
-代码遵循 [GPL-3.0](https://github.com/qingyueyin/Pure-music/blob/main/LICENSE)。
+代码遵循 [GPL-3.0](https://github.com/junglecola001/Pure-music/blob/main/LICENSE)。
 
 请尊重（非法律条款）：仅限非商业用途；使用或修改时注明出处，并附上本仓库链接。
 

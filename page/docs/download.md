@@ -15,7 +15,7 @@ description: 下载安装版或便携版。Windows 10 / 11，无需管理员。
 - **便携版**：文件名带 `portable` 的 `.zip`
 - `Source code` 是源码，不能直接运行
 
-历史版本见 [GitHub Releases](https://github.com/qingyueyin/Pure-music/releases)。GitHub 慢可用 [Gitee](https://gitee.com/qingyueyin/Pure-music)，镜像常滞后，请核对版本号。
+历史版本见 [GitHub Releases](https://github.com/junglecola001/Pure-music/releases)。GitHub 慢可用 [Gitee](https://gitee.com/junglecola001/Pure-music)，镜像常滞后，请核对版本号。
 :::
 
 ## 系统要求

@@ -7,7 +7,7 @@ description: Pure Music 更新日志，自 2.0.0 起按版本折叠。
 
 从 **2.0.0** 起。每个版本默认折叠，点版本号展开。最新：**2.3.1**。
 
-完整发布页：[GitHub](https://github.com/qingyueyin/Pure-music/releases) · [Gitee 镜像](https://gitee.com/qingyueyin/Pure-music)（同步常滞后）
+完整发布页：[GitHub](https://github.com/junglecola001/Pure-music/releases) · [Gitee 镜像](https://gitee.com/junglecola001/Pure-music)（同步常滞后）
 
 <details>
 <summary><strong>2.3.1</strong></summary>
@@ -726,4 +726,4 @@ description: Pure Music 更新日志，自 2.0.0 起按版本折叠。
 
 ---
 
-更早版本见 [GitHub Releases](https://github.com/qingyueyin/Pure-music/releases)。下载见 [下载页](/download)。
+更早版本见 [GitHub Releases](https://github.com/junglecola001/Pure-music/releases)。下载见 [下载页](/download)。

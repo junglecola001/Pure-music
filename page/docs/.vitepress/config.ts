@@ -1,6 +1,6 @@
 import { defineConfig, type HeadConfig } from 'vitepress'
 
-const SITE = 'https://qingyueyin.github.io/Pure-music'
+const SITE = 'https://junglecola001.github.io/Pure-music'
 const OG_IMAGE = `${SITE}/logo.png`
 const DEFAULT_DESC =
   'Windows 本地音乐播放器。导入文件夹即可播放；支持多格式歌词、10 段 EQ、音调与 WASAPI 独占。'
@@ -161,12 +161,12 @@ export default defineConfig({
       ],
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/qingyueyin/Pure-music' },
+      { icon: 'github', link: 'https://github.com/junglecola001/Pure-music' },
       {
         icon: {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.985 2C6.486 2 2 6.486 2 11.985c0 4.378 2.847 8.086 6.78 9.387-.094-.82-.178-2.078.037-2.972.194-.828 1.25-5.29 1.25-5.29s-.319-.638-.319-1.582c0-1.482.86-2.59 1.93-2.59.91 0 1.35.683 1.35 1.502 0 .915-.583 2.283-.883 3.552-.251 1.062.532 1.928 1.578 1.928 1.895 0 3.352-1.998 3.352-4.88 0-2.552-1.834-4.337-4.455-4.337-3.034 0-4.815 2.276-4.815 4.627 0 .916.353 1.9.793 2.434a.32.32 0 0 1 .073.306c-.08.334-.26 1.06-.295 1.208-.047.194-.153.235-.353.141-1.32-.615-2.145-2.545-2.145-4.098 0-3.362 2.443-6.45 7.043-6.45 3.697 0 6.572 2.634 6.572 6.155 0 3.672-2.315 6.63-5.528 6.63-1.08 0-2.095-.56-2.443-1.223 0 0-.535 2.04-.665 2.538-.241.925-.89 2.084-1.325 2.79A10.02 10.02 0 0 0 11.985 22C17.514 22 22 17.514 22 11.985 22 6.486 17.514 2 11.985 2z"/></svg>',
         },
-        link: 'https://gitee.com/qingyueyin/Pure-music',
+        link: 'https://gitee.com/junglecola001/Pure-music',
       },
       {
         icon: {
@@ -177,7 +177,7 @@ export default defineConfig({
     ],
     footer: {
       message: '以 GPL-3.0 许可发布。',
-      copyright: '© 2026 Pure Music · Made by qingyueyin',
+      copyright: '© 2026 Pure Music · Made by junglecola001',
     },
     outline: {
       label: '本页目录',

@@ -8,14 +8,14 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=flat-square" alt="Platform">
-  <a href="https://github.com/qingyueyin/Pure-music/releases/latest"><img src="https://img.shields.io/github/v/release/qingyueyin/Pure-music?style=flat-square&color=0969da" alt="Version"></a>
-  <a href="https://github.com/qingyueyin/Pure-music/releases/latest"><img src="https://img.shields.io/github/downloads/qingyueyin/Pure-music/total?style=flat-square&color=2ea44f" alt="Downloads"></a>
+  <a href="https://github.com/junglecola001/Pure-music/releases/latest"><img src="https://img.shields.io/github/v/release/junglecola001/Pure-music?style=flat-square&color=0969da" alt="Version"></a>
+  <a href="https://github.com/junglecola001/Pure-music/releases/latest"><img src="https://img.shields.io/github/downloads/junglecola001/Pure-music/total?style=flat-square&color=2ea44f" alt="Downloads"></a>
   <a href="#license"><img src="https://img.shields.io/badge/License-GPL--3.0-green?style=flat-square" alt="License"></a>
 </p>
 
 <p align="center">
-  <a href="https://qingyueyin.github.io/Pure-music/"><img src="https://img.shields.io/badge/网站-使用指南-28a745?style=flat-square" alt="Website"></a>
-  <a href="https://gitee.com/qingyueyin/Pure-music"><img src="https://img.shields.io/badge/Gitee-镜像-C71D23?style=flat-square" alt="Gitee"></a>
+  <a href="https://junglecola001.github.io/Pure-music/"><img src="https://img.shields.io/badge/网站-使用指南-28a745?style=flat-square" alt="Website"></a>
+  <a href="https://gitee.com/junglecola001/Pure-music"><img src="https://img.shields.io/badge/Gitee-镜像-C71D23?style=flat-square" alt="Gitee"></a>
   <a href="https://t.me/+NsZamWiEKh5lOWNl"><img src="https://img.shields.io/badge/Telegram-群组-2AABEE?style=flat-square" alt="Telegram"></a>
   <a href="https://linux.do"><img src="https://img.shields.io/badge/LINUX_DO-社区-ff7800?style=flat-square" alt="LINUX DO"></a>
 </p>
@@ -163,17 +163,17 @@ flutter_rust_bridge_codegen generate
 
 ## 贡献者
 
-[![contrib.rocks](https://contrib.rocks/image?repo=qingyueyin/Pure-music&max=1000&v=3)](https://github.com/qingyueyin/Pure-music/graphs/contributors)
+[![contrib.rocks](https://contrib.rocks/image?repo=junglecola001/Pure-music&max=1000&v=3)](https://github.com/junglecola001/Pure-music/graphs/contributors)
 
 ---
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=qingyueyin%2FPure-music&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=junglecola001%2FPure-music&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=qingyueyin/Pure-music&type=date&theme=dark&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=qingyueyin/Pure-music&type=date&theme=light&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=qingyueyin/Pure-music&type=date&theme=light&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=junglecola001/Pure-music&type=date&theme=dark&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=junglecola001/Pure-music&type=date&theme=light&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=junglecola001/Pure-music&type=date&theme=light&legend=top-left&sealed_token=3xg2arWalPfLMWP-v8tF6oiUigXHChZGv3G5byMARkfFx4mAH_bKPZWuYsOGt0OXyQAacmwE94DO-yNQKFu3d1xE7KqjHBRQ1PXDBRrIb9-lsK6IVQyzdA" />
  </picture>
 </a>
 
@@ -193,4 +193,4 @@ flutter_rust_bridge_codegen generate
 
 ---
 
-<div align="center">Made with ❤️ by qingyueyin</div>
+<div align="center">Made with ❤️ by junglecola001</div>

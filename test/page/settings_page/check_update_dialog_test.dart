@@ -9,10 +9,10 @@ void main() {
     'tag_name': 'v9.9.9',
     'body': '说明',
     'installer_url':
-        'https://github.com/qingyueyin/Pure-music/releases/download/v9.9.9/app.exe',
+        'https://github.com/junglecola001/Pure-music/releases/download/v9.9.9/app.exe',
     'installer_sha256': 'ab' * 32,
     'portable_url':
-        'https://github.com/qingyueyin/Pure-music/releases/download/v9.9.9/app.zip',
+        'https://github.com/junglecola001/Pure-music/releases/download/v9.9.9/app.zip',
     'portable_sha256': 'cd' * 32,
     'portable_size': 1024,
   });

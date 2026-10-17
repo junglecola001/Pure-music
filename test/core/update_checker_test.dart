@@ -250,7 +250,7 @@ void main() {
   test('update metadata urls require https and exact hosts', () {
     expect(
       isAllowedUpdateMetadataUrl(
-        'https://raw.githubusercontent.com/qingyueyin/Pure-music/main/update/version.json',
+        'https://raw.githubusercontent.com/junglecola001/Pure-music/main/update/version.json',
         UpdateChannel.github,
       ),
       isTrue,
@@ -264,14 +264,14 @@ void main() {
     );
     expect(
       isAllowedUpdateMetadataUrl(
-        'http://raw.githubusercontent.com/qingyueyin/Pure-music/main/update/version.json',
+        'http://raw.githubusercontent.com/junglecola001/Pure-music/main/update/version.json',
         UpdateChannel.github,
       ),
       isFalse,
     );
     expect(
       isAllowedUpdateMetadataUrl(
-        'https://gitee.com/qingyueyin/Pure-music/raw/main/update/version.json',
+        'https://gitee.com/junglecola001/Pure-music/raw/main/update/version.json',
         UpdateChannel.gitee,
       ),
       isTrue,
@@ -281,7 +281,7 @@ void main() {
   test('update download urls reject lookalike and http hosts', () {
     expect(
       isAllowedUpdateDownloadUrl(
-        'https://github.com/qingyueyin/Pure-music/releases/download/v2.3.0/app.exe',
+        'https://github.com/junglecola001/Pure-music/releases/download/v2.3.0/app.exe',
         UpdateChannel.github,
       ),
       isTrue,
@@ -295,14 +295,14 @@ void main() {
     );
     expect(
       isAllowedUpdateDownloadUrl(
-        'https://gitee.com/qingyueyin/Pure-music/releases/download/v2.3.0/app.exe',
+        'https://gitee.com/junglecola001/Pure-music/releases/download/v2.3.0/app.exe',
         UpdateChannel.gitee,
       ),
       isTrue,
     );
     expect(
       isAllowedUpdateDownloadUrl(
-        'https://gitee.com/qingyueyin/Pure-music/releases/download/v2.3.0/app.exe',
+        'https://gitee.com/junglecola001/Pure-music/releases/download/v2.3.0/app.exe',
         UpdateChannel.github,
       ),
       isFalse,
@@ -316,7 +316,7 @@ void main() {
         {
           'name': 'pure_music_2.3.0_release_installer.exe',
           'browser_download_url':
-              'https://github.com/qingyueyin/Pure-music/releases/download/v2.3.0/pure_music_2.3.0_release_installer.exe',
+              'https://github.com/junglecola001/Pure-music/releases/download/v2.3.0/pure_music_2.3.0_release_installer.exe',
         },
       ],
     }, channel: UpdateChannel.github);
@@ -324,7 +324,7 @@ void main() {
       'tag_name': 'v2.3.0',
       'installer_sha256': 'a' * 64,
       'installer_checksum_url':
-          'https://github.com/qingyueyin/Pure-music/releases/download/v2.3.0/pure_music_2.3.0_release_installer.exe.sha256',
+          'https://github.com/junglecola001/Pure-music/releases/download/v2.3.0/pure_music_2.3.0_release_installer.exe.sha256',
     });
     final merged = api.withFallbackChecksums(packed);
     expect(merged.sha256(portableBuild: false), 'a' * 64);

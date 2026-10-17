@@ -319,7 +319,7 @@ onUnmounted(() => {
     <img :src="logoUrl" width="72" height="72" alt="" />
   </div>
   <footer class="pm-foot">
-    <p class="pm-foot-note">以 GPL-3.0 许可发布 · © 2026 · Made by qingyueyin</p>
+    <p class="pm-foot-note">以 GPL-3.0 许可发布 · © 2026 · Made by junglecola001</p>
   </footer>
   <Teleport to="body">
     <div

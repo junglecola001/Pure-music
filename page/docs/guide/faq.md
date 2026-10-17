@@ -18,7 +18,7 @@ description: 安装、曲库、播放、歌词、桌面歌词与热键的常见�
 
 ### GitHub 很慢，能用 Gitee 吗？
 
-可以。[Gitee 仓库](https://gitee.com/qingyueyin/Pure-music) 是镜像。
+可以。[Gitee 仓库](https://gitee.com/junglecola001/Pure-music) 是镜像。
 
 同步经常很慢，版本以 **GitHub Releases** 和本站 [更新日志](/guide/changelog) 为准。应用内检查更新也先走 GitHub，失败才会试备用地址（其中含 Gitee 上的 `version.json`，同样可能滞后）。
 
@@ -518,7 +518,7 @@ TTML 等格式若文件里自己写了空白段，也会当间奏用，规则不
 
 ### 怎么反馈问题？
 
-先在本页搜现象。还不能确认是程序问题，去 [Discussions](https://github.com/qingyueyin/Pure-music/discussions/categories/general)；能复现的异常，用 [Issue 模板](https://github.com/qingyueyin/Pure-music/issues/new/choose)。
+先在本页搜现象。还不能确认是程序问题，去 [Discussions](https://github.com/junglecola001/Pure-music/discussions/categories/general)；能复现的异常，用 [Issue 模板](https://github.com/junglecola001/Pure-music/issues/new/choose)。
 
 「设置 → 关于 → 报告问题」会打开表单并复制日志快照，粘贴到「完整日志」。看 APPLICATION_LOG 里的 problems，再看 timeline，不要换成自己打开的 `.log`。
 
@@ -527,7 +527,7 @@ TTML 等格式若文件里自己写了空白段，也会当间奏用，规则不
 - 怪声可先开回声日志再写快照
 - 公开前遮盖账号、令牌和无关私人路径
 
-字段说明见 [Issue 提交规范](https://github.com/qingyueyin/Pure-music/blob/main/.github/ISSUE_GUIDELINES.md)。
+字段说明见 [Issue 提交规范](https://github.com/junglecola001/Pure-music/blob/main/.github/ISSUE_GUIDELINES.md)。
 
 ---
 
@@ -561,6 +561,6 @@ U 盘或目标文件夹必须能写入。只读盘无法写 `data`。
 | 设置项 | [设置](/guide/settings) |
 | 桌面歌词 | [桌面歌词](/guide/desktop-lyric) |
 | 鼠标操作 | [操作指南](/guide/interactions) |
-| 使用问题与交流 | [Discussions](https://github.com/qingyueyin/Pure-music/discussions/categories/general) |
-| Bug、功能建议与文档问题 | [Issue 模板](https://github.com/qingyueyin/Pure-music/issues/new/choose) |
-| 源码 | [GitHub](https://github.com/qingyueyin/Pure-music) · [Gitee 镜像](https://gitee.com/qingyueyin/Pure-music)（可能滞后） |
+| 使用问题与交流 | [Discussions](https://github.com/junglecola001/Pure-music/discussions/categories/general) |
+| Bug、功能建议与文档问题 | [Issue 模板](https://github.com/junglecola001/Pure-music/issues/new/choose) |
+| 源码 | [GitHub](https://github.com/junglecola001/Pure-music) · [Gitee 镜像](https://gitee.com/junglecola001/Pure-music)（可能滞后） |

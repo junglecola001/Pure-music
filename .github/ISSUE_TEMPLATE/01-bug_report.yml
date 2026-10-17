@@ -7,9 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        为了更快区分程序问题、配置问题和文件问题，请先阅读[常见问题](https://qingyueyin.github.io/Pure-music/guide/faq)，按文档完成排查，再搜索已有 Issue 并使用最新版本复现。还不能确认是程序问题时，更适合先到 [Discussions](https://github.com/qingyueyin/Pure-music/discussions/categories/general) 交流。暂时缺少日志、复现步骤、相关文件或自查结果时，Issue 可能会先关闭；补充完整后可以重新评估。
+        为了更快区分程序问题、配置问题和文件问题，请先阅读[常见问题](https://junglecola001.github.io/Pure-music/guide/faq)，按文档完成排查，再搜索已有 Issue 并使用最新版本复现。还不能确认是程序问题时，更适合先到 [Discussions](https://github.com/junglecola001/Pure-music/discussions/categories/general) 交流。暂时缺少日志、复现步骤、相关文件或自查结果时，Issue 可能会先关闭；补充完整后可以重新评估。
 
-        从应用内「设置 → 关于 → 报告问题」提交时，版本和系统信息一般会自动填好，日志会复制到剪贴板。请粘贴到「完整日志」，并补全安装方式、问题分类等项。不要用自己打开的 `.log` 文件代替应用生成的快照。阅读方式见 [Issue 提交规范](https://github.com/qingyueyin/Pure-music/blob/main/.github/ISSUE_GUIDELINES.md)。
+        从应用内「设置 → 关于 → 报告问题」提交时，版本和系统信息一般会自动填好，日志会复制到剪贴板。请粘贴到「完整日志」，并补全安装方式、问题分类等项。不要用自己打开的 `.log` 文件代替应用生成的快照。阅读方式见 [Issue 提交规范](https://github.com/junglecola001/Pure-music/blob/main/.github/ISSUE_GUIDELINES.md)。
 
   - type: input
     id: version

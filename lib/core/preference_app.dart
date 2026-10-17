@@ -1,10 +1,10 @@
 part of 'preference.dart';
 
 class AppPreference {
-  static const defaultUpdateRepoSlug = 'qingyueyin/Pure-music';
+  static const defaultUpdateRepoSlug = 'junglecola001/Pure-music';
   static const defaultUpdateCheckUrls = [
-    'https://raw.githubusercontent.com/qingyueyin/Pure-music/main/update/version.json',
-    'https://gitee.com/qingyueyin/Pure-music/raw/main/update/version.json',
+    'https://raw.githubusercontent.com/junglecola001/Pure-music/main/update/version.json',
+    'https://gitee.com/junglecola001/Pure-music/raw/main/update/version.json',
   ];
 
   var audiosPagePref = PagePreference(0, SortOrder.ascending, ContentView.list);

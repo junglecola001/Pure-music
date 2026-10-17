@@ -41,14 +41,14 @@ class AboutTabContent extends StatelessWidget {
         const SizedBox(height: 4.0),
         const _AboutLinkItem(
           title: '官方网站',
-          url: 'https://qingyueyin.github.io/Pure-music/',
+          url: 'https://junglecola001.github.io/Pure-music/',
           actionLabel: '访问官网',
           icon: Symbols.language,
         ),
         const SizedBox(height: 16.0),
         const _AboutLinkItem(
           title: '项目主页',
-          url: 'https://github.com/qingyueyin/Pure-music',
+          url: 'https://github.com/junglecola001/Pure-music',
           actionLabel: '打开仓库',
           icon: Symbols.code,
         ),

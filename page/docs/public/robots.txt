@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://qingyueyin.github.io/Pure-music/sitemap.xml
+Sitemap: https://junglecola001.github.io/Pure-music/sitemap.xml

@@ -17,4 +17,4 @@ description: 可能继续完善的功能，不代表开发顺序。
 
 ---
 
-建议或问题优先去 [GitHub Issues](https://github.com/qingyueyin/Pure-music/issues)。[Gitee](https://gitee.com/qingyueyin/Pure-music) 只是下载镜像，可能滞后。
+建议或问题优先去 [GitHub Issues](https://github.com/junglecola001/Pure-music/issues)。[Gitee](https://gitee.com/junglecola001/Pure-music) 只是下载镜像，可能滞后。

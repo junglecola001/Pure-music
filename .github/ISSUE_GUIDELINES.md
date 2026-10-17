@@ -1,15 +1,15 @@
 # Issue 提交规范
 
-先看 [常见问题](https://qingyueyin.github.io/Pure-music/guide/faq)。还不能确认是程序问题时，先到 [Discussions](https://github.com/qingyueyin/Pure-music/discussions/categories/general)。已经能复现的异常，再用对应模板提交。
+先看 [常见问题](https://junglecola001.github.io/Pure-music/guide/faq)。还不能确认是程序问题时，先到 [Discussions](https://github.com/junglecola001/Pure-music/discussions/categories/general)。已经能复现的异常，再用对应模板提交。
 
 ## 用哪个入口
 
 | 情况 | 入口 |
 |------|------|
-| 能复现的异常 | [Bug 模板](https://github.com/qingyueyin/Pure-music/issues/new?template=01-bug_report.yml) |
-| 新功能 | [新功能模板](https://github.com/qingyueyin/Pure-music/issues/new?template=02-feature_request.yml) |
-| 现有功能改进 | [改进模板](https://github.com/qingyueyin/Pure-music/issues/new?template=03-enhancement.yml) |
-| 文档问题 | [文档模板](https://github.com/qingyueyin/Pure-music/issues/new?template=04-documentation.yml) |
+| 能复现的异常 | [Bug 模板](https://github.com/junglecola001/Pure-music/issues/new?template=01-bug_report.yml) |
+| 新功能 | [新功能模板](https://github.com/junglecola001/Pure-music/issues/new?template=02-feature_request.yml) |
+| 现有功能改进 | [改进模板](https://github.com/junglecola001/Pure-music/issues/new?template=03-enhancement.yml) |
+| 文档问题 | [文档模板](https://github.com/junglecola001/Pure-music/issues/new?template=04-documentation.yml) |
 
 应用内路径：设置 → 关于 → 报告问题。点「提交问题」会打开 Bug 表单，并把日志快照复制到剪贴板。请把快照粘贴到「完整日志」，再补全安装方式、问题分类等必填项。不要把应用生成的快照换成自己打开的 `.log` 文件。
 

@@ -532,9 +532,9 @@ class UpdateChecker {
   static const _githubApiBase = 'https://api.github.com/repos';
   static const _giteeApiBase = 'https://gitee.com/api/v5/repos';
   static const _githubFallbackUrl =
-      'https://raw.githubusercontent.com/qingyueyin/Pure-music/main/update/version.json';
+      'https://raw.githubusercontent.com/junglecola001/Pure-music/main/update/version.json';
   static const _giteeFallbackUrl =
-      'https://gitee.com/qingyueyin/Pure-music/raw/main/update/version.json';
+      'https://gitee.com/junglecola001/Pure-music/raw/main/update/version.json';
 
   static Future<UpdateInfo?> checkForUpdate({
     required UpdateChannel channel,

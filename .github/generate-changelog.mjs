@@ -4,7 +4,7 @@
  *
  * 环境变量:
  *   GITHUB_TOKEN / GH_TOKEN  — 可选，提高 API 限额
- *   GITHUB_REPOSITORY        — owner/repo，默认 qingyueyin/Pure-music
+ *   GITHUB_REPOSITORY        — owner/repo，默认 junglecola001/Pure-music
  *   MIN_TAG                  — 收录的最低版本，默认 v2.0.0
  */
 import { writeFileSync, mkdirSync } from 'node:fs'
@@ -20,11 +20,11 @@ const latestReleasePath = join(
   'page/docs/public/latest-release.json',
 )
 
-const repo = process.env.GITHUB_REPOSITORY || 'qingyueyin/Pure-music'
+const repo = process.env.GITHUB_REPOSITORY || 'junglecola001/Pure-music'
 const giteeRepo =
   process.env.GITEE_REPOSITORY ||
   process.env.GITEE_REPO ||
-  'qingyueyin/Pure-music'
+  'junglecola001/Pure-music'
 const minTag = (process.env.MIN_TAG || 'v2.0.0').trim()
 const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || ''
 

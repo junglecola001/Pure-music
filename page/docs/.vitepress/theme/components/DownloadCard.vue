@@ -63,13 +63,13 @@ const githubUrl = computed(
   () =>
     meta.value?.github_release_url ||
     meta.value?.github_releases_url ||
-    'https://github.com/qingyueyin/Pure-music/releases',
+    'https://github.com/junglecola001/Pure-music/releases',
 )
 const giteeUrl = computed(
   () =>
     meta.value?.gitee_releases_url ||
     meta.value?.gitee_repo_url ||
-    'https://gitee.com/qingyueyin/Pure-music',
+    'https://gitee.com/junglecola001/Pure-music',
 )
 const installerHref = computed(
   () => meta.value?.installer_url || githubUrl.value,
