@@ -7,7 +7,7 @@
  *   GITHUB_REPOSITORY        — owner/repo，默认 junglecola001/Pure-music
  *   MIN_TAG                  — 收录的最低版本，默认 v2.0.0
  */
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -114,24 +114,46 @@ function extraNote(tag, name) {
   return notes.length ? `（${notes.join(' · ')}）` : ''
 }
 
-function buildChangelogMarkdown(releases) {
-  const blocks = releases.map((r) => {
-    const ver = displayVersion(r.tag_name, r.name)
-    const note = extraNote(r.tag_name, r.name)
-    const body = bodyToFoldedMarkdown(r.body)
+/** 版本的比较用键，与 parseVersion 对齐；无法解析时返回空串 */
+function versionKey(tag) {
+  const parsed = parseVersion(tag)
+  return parsed ? parsed.join('.') : ''
+}
+
+/**
+ * 从已有 changelog.md 里读出「版本 → 折叠块」。
+ * 仓库迁移后新仓库的 Release 列表里没有旧版本，靠它把历史版本原样留下来。
+ */
+function readExistingBlocks() {
+  let text = ''
+  try {
+    text = readFileSync(changelogPath, 'utf8')
+  } catch {
+    return new Map()
+  }
+  const blocks = new Map()
+  const re =
+    /<details>\n<summary><strong>([^<]+)<\/strong>([^<]*)<\/summary>\n([\s\S]*?)\n<\/details>/g
+  let match
+  while ((match = re.exec(text))) {
+    const ver = match[1].trim()
+    const key = versionKey(ver)
+    if (!key || blocks.has(key)) continue
+    blocks.set(key, { ver, note: match[2].trim(), body: match[3].trim() })
+  }
+  return blocks
+}
+
+function buildChangelogMarkdown(entries, latestLabel) {
+  const blocks = entries.map((entry) => {
     return [
       '<details>',
-      `<summary><strong>${ver}</strong>${note}</summary>`,
-      body,
+      `<summary><strong>${entry.ver}</strong>${entry.note || ''}</summary>`,
+      `\n${String(entry.body).trim()}\n`,
       '</details>',
       '',
     ].join('\n')
   })
-
-  const latest = releases[0]
-  const latestLabel = latest
-    ? displayVersion(latest.tag_name, latest.name)
-    : '—'
 
   return `---
 outline: false
@@ -367,10 +389,32 @@ async function main() {
     throw new Error(`No releases >= ${minTag}`)
   }
 
-  const md = buildChangelogMarkdown(releases)
+  // 本次 API 拿到的版本（新仓库里的正式发布）
+  const entries = []
+  const freshKeys = new Set()
+  for (const r of releases) {
+    const ver = displayVersion(r.tag_name, r.name)
+    const key = versionKey(r.tag_name) || versionKey(ver)
+    if (key) freshKeys.add(key)
+    entries.push({
+      ver,
+      note: extraNote(r.tag_name, r.name),
+      body: bodyToFoldedMarkdown(r.body),
+    })
+  }
+
+  // 补回历史版本：迁移前的老 Release 不在新仓库，保留已有 changelog 里的折叠块
+  for (const [key, entry] of readExistingBlocks()) {
+    if (freshKeys.has(key) || !meetsMinTag(entry.ver)) continue
+    entries.push(entry)
+  }
+  entries.sort((a, b) => cmpVersion(b.ver, a.ver))
+
+  const latestLabel = entries[0]?.ver || '—'
+  const md = buildChangelogMarkdown(entries, latestLabel)
   mkdirSync(dirname(changelogPath), { recursive: true })
   writeFileSync(changelogPath, md, 'utf8')
-  console.log(`wrote ${changelogPath} (${releases.length} versions)`)
+  console.log(`wrote ${changelogPath} (${entries.length} versions)`)
 
   const latest = pickLatestStable(releases)
   const assets = await collectReleaseAssets(latest)
